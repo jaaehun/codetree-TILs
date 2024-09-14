@@ -11,6 +11,7 @@ list<int> belt[10];
 int where[100001];
 int weight[100001];
 int wrong[10];
+int parent[10];
 
 int find_idx(int id) {
 	if (um.find(id) != um.end()) {
@@ -18,6 +19,15 @@ int find_idx(int id) {
 	}
 	else {
 		return -1;
+	}
+}
+
+int find_parent(int n) {
+	if (parent[n] == n) {
+		return n;
+	}
+	else {
+		return parent[n] = find_parent(parent[n]);
 	}
 }
 
@@ -33,7 +43,7 @@ void init(int n, int m) {
 
 		um[id] = um.size();
 		belt[belt_n].push_back(um[id]);
-		where[um[id]] = belt_n + 1;
+		where[um[id]] = belt_n;
 		cnt++;
 		if (cnt == n / m) {
 			belt_n++;
@@ -45,6 +55,10 @@ void init(int n, int m) {
 		int w;
 		cin >> w;
 		weight[i] = w;
+	}
+
+	for (int i = 0; i < m; i++) {
+		parent[i] = i;
 	}
 }
 
@@ -82,8 +96,9 @@ int remove(int r_id) {
 		}
 		else {
 			int now_belt = where[now_idx];
-			auto iter = find(belt[now_belt - 1].begin(), belt[now_belt - 1].end(), now_idx);
-			belt[now_belt - 1].erase(iter);
+			now_belt = find_parent(now_belt);
+			auto iter = find(belt[now_belt].begin(), belt[now_belt].end(), now_idx);
+			belt[now_belt].erase(iter);
 			where[now_idx] = -1;
 
 			return 1;
@@ -102,12 +117,13 @@ int check(int r_id) {
 		}
 		else {
 			int now_belt = where[now_idx];
-			auto iter = find(belt[now_belt - 1].begin(), belt[now_belt - 1].end(), now_idx);
+			now_belt = find_parent(now_belt);
+			auto iter = find(belt[now_belt].begin(), belt[now_belt].end(), now_idx);
 			list<int> tmp;
-			tmp.splice(tmp.begin(), belt[now_belt - 1], iter, belt[now_belt - 1].end());
-			belt[now_belt - 1].splice(belt[now_belt - 1].begin(), tmp);
+			tmp.splice(tmp.begin(), belt[now_belt], iter, belt[now_belt].end());
+			belt[now_belt].splice(belt[now_belt].begin(), tmp);
 
-			return now_belt;
+			return now_belt + 1;
 		}
 	}
 }
@@ -130,6 +146,7 @@ int broken(int b_num) {
 		}
 		belt[now_n].splice(belt[now_n].end(), belt[b_num]);
 		wrong[b_num] = 1;
+		parent[b_num] = now_n;
 
 		return 1;
 	}
