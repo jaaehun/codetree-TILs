@@ -140,6 +140,9 @@ int main() {
 				now_y = now_y + dy[now_d];
 				now_x = now_x + dx[now_d];
 			}
+			player[i].y = now_y;
+			player[i].x = now_x;
+			player[i].dir = now_d;
 
 			if (player_map[now_y][now_x] == 0) {
 				if (gun_map[now_y][now_x].size() != 0) {
@@ -153,9 +156,6 @@ int main() {
 					}
 				}
 				player_map[now_y][now_x] = i;
-				player[i].y = now_y;
-				player[i].x = now_x;
-				player[i].dir = now_d;
 			}
 			else {
 				int a = i;
