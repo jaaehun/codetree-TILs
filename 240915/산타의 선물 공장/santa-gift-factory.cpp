@@ -224,7 +224,7 @@ int brocken(int n) {
 		
 		belt[tmp].size += belt[n].size;
 
-		belt[tmp].size = -1;
+		belt[n].size = -1;
 		belt[n].first = -1;
 		belt[n].end = -1;
 		belt[n].wrong = 1;
