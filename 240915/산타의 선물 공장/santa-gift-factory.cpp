@@ -8,6 +8,7 @@ struct BELT {
 	int first;
 	int end;
 	int wrong;
+	int size;
 };
 
 struct BOX {
@@ -45,11 +46,12 @@ void init(int n, int m) {
 		cnt++;
 		if (cnt == 1) {
 			belt[belt_n].first = id;
+			belt[belt_n].size++;
 			box[id] = { 0,belt_n,-1,0 };
 		}
 		else if (cnt == n / m) {
 			belt[belt_n].end = id;
-
+			belt[belt_n].size++;
 			box[v_box[i - 1]].back = id;
 			box[id] = { 0,belt_n,v_box[i - 1],-1 };
 
@@ -58,6 +60,7 @@ void init(int n, int m) {
 		}
 		else {
 			box[v_box[i - 1]].back = id;
+			belt[belt_n].size++;
 			box[id] = { 0,belt_n,v_box[i - 1],0 };
 		}
 	}
@@ -79,14 +82,20 @@ void init(int n, int m) {
 int unload(int w_max) {
 	int sum = 0;
 	for (int i = 1; i <= M; i++) {
-		if (belt[i].wrong == 0 && belt[i].first != -1) {
+		if (belt[i].wrong == 0 && belt[i].size != 0) {
 			int now_first = belt[i].first;
-			belt[i].first = box[now_first].back;
-			box[belt[i].first].front = -1;
+			if (belt[i].size == 1) {
+				belt[i].first = -1;
+			}
+			else {
+				belt[i].first = box[now_first].back;
+				box[belt[i].first].front = -1;
+			}
 
 			if (box[now_first].weight <= w_max) {
 				sum += box[now_first].weight;
 				box[now_first].belt_num = -1;
+				belt[i].size--;
 			}
 			else {
 				int now_end = belt[i].end;
@@ -113,20 +122,26 @@ int remove(int r_id) {
 			belt_n = find_parent(belt_n);
 			int now_front = box[r_id].front;
 			int now_back = box[r_id].back;
-
-			if (belt[belt_n].first == r_id) {
-				belt[belt_n].first = now_back;
-				box[now_back].front = -1;
-			}
-			else if (belt[belt_n].end == r_id) {
-				belt[belt_n].end = now_front;
-				box[now_front].back = -1;
+			if (belt[belt_n].size == 1) {
+				belt[belt_n].first = -1;
+				belt[belt_n].end = -1;
 			}
 			else {
-				box[now_front].back = now_back;
-				box[now_back].front = now_front;
+				if (belt[belt_n].first == r_id) {
+					belt[belt_n].first = now_back;
+					box[now_back].front = -1;
+				}
+				else if (belt[belt_n].end == r_id) {
+					belt[belt_n].end = now_front;
+					box[now_front].back = -1;
+				}
+				else {
+					box[now_front].back = now_back;
+					box[now_back].front = now_front;
+				}
 			}
 			box[r_id].belt_num = -1;
+			belt[belt_n].size--;
 
 			return 1;
 		}
@@ -194,7 +209,10 @@ int brocken(int n) {
 		box[now_end].back = prev_first;
 		box[prev_first].front = now_end;
 		belt[tmp].end = belt[n].end;
+		
+		belt[tmp].size += belt[n].size;
 
+		belt[tmp].size = -1;
 		belt[n].first = -1;
 		belt[n].end = -1;
 		belt[n].wrong = 1;
