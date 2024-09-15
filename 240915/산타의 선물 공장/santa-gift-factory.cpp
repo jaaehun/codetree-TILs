@@ -84,24 +84,35 @@ int unload(int w_max) {
 	for (int i = 1; i <= M; i++) {
 		if (belt[i].wrong == 0 && belt[i].size != 0) {
 			int now_first = belt[i].first;
-			if (belt[i].size == 1) {
-				belt[i].first = -1;
-			}
-			else {
-				belt[i].first = box[now_first].back;
-				box[belt[i].first].front = -1;
-			}
-
+			int now_end = belt[i].end;
+			int now_front = box[now_first].front;
+			int now_back = box[now_first].back;
 			if (box[now_first].weight <= w_max) {
-				sum += box[now_first].weight;
+				if (belt[i].size == 1) {
+					belt[i].first = -1;
+					belt[i].end = -1;
+				}
+				else {
+					belt[i].first = now_back;
+					box[now_back].front = -1;
+				}
 				box[now_first].belt_num = -1;
+				sum += box[now_first].weight;
 				belt[i].size--;
 			}
 			else {
-				int now_end = belt[i].end;
-				belt[i].end = now_first;
-				box[now_end].back = now_first;
-				box[now_first].front = now_end;
+				if (belt[i].size == 1) {
+					continue;
+				}
+				else {
+					belt[i].end = now_first;
+					belt[i].first = now_back;
+
+					box[now_end].back = now_first;
+					box[now_back].front = -1;
+					box[now_first].front = now_end;
+					box[now_first].back = -1;
+				}
 			}
 		}
 	}
@@ -122,23 +133,24 @@ int remove(int r_id) {
 			belt_n = find_parent(belt_n);
 			int now_front = box[r_id].front;
 			int now_back = box[r_id].back;
-			if (belt[belt_n].size == 1) {
+			if (now_front == -1 && now_back == -1) {
 				belt[belt_n].first = -1;
 				belt[belt_n].end = -1;
 			}
-			else {
-				if (belt[belt_n].first == r_id) {
-					belt[belt_n].first = now_back;
-					box[now_back].front = -1;
-				}
-				else if (belt[belt_n].end == r_id) {
-					belt[belt_n].end = now_front;
-					box[now_front].back = -1;
-				}
-				else {
-					box[now_front].back = now_back;
-					box[now_back].front = now_front;
-				}
+			else if (now_front == -1)
+			{
+				belt[belt_n].first = now_back;
+				box[now_back].front = -1;
+			}
+			else if (now_back == -1)
+			{
+				belt[belt_n].end = now_back;
+				box[now_front].back = -1;
+			}
+			else
+			{
+				box[now_front].back = now_back;
+				box[now_back].front = now_front;
 			}
 			box[r_id].belt_num = -1;
 			belt[belt_n].size--;
