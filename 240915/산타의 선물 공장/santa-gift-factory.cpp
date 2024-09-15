@@ -1,310 +1,352 @@
-#include<iostream>
-#include<unordered_map>
-#include<vector>
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+
+#define MAX_BELT 15
+#define MAX_BOX 100010
 
 using namespace std;
 
 struct BELT {
-	int first;
-	int end;
-	int wrong;
-	int size;
+	int num;
+	int front;
+	int back;
+	int state;
 };
 
 struct BOX {
 	int weight;
-	int belt_num;
-	int front;
-	int back;
+	int belt_id;
+	int prev;
+	int next;
 };
 
-BELT belt[11];
-int parent[11];
+int n, m;
+int input[MAX_BOX];
 unordered_map<int, BOX> box;
-int N, M;
+unordered_map<int, BELT> belt;
 
-int find_parent(int n) {
-	if (parent[n] == n) {
-		return n;
-	}
-	else {
-		return parent[n] = find_parent(parent[n]);
-	}
-}
+void FUNC(int Q)
+{
+	if (Q == 100)
+	{
+		cin >> n >> m;
 
-void init(int n, int m) {
-	N = n;
-	M = m;
+		int cnt = 0;
+		int belt_id = 1;
+		int pivot = n/m;
+		for (int i = 0; i < n; i++)
+		{
+			int id;
+			cin >> id;
+			// BOX ID의 input 배열
+			input[i] = id;
+			// belt 해쉬맵 만들기
+			if (cnt == 0)
+			{
+				belt[belt_id].front = id;
+				belt[belt_id].back = id;
+				belt[belt_id].state = 0;
+				belt[belt_id].num = pivot;
 
-	int belt_n = 1;
-	int cnt = 0;
-	vector<int> v_box;
-	for (int i = 0; i < n; i++) {
-		int id;
-		cin >> id;
-		v_box.push_back(id);
-		cnt++;
-		if (cnt == 1) {
-			belt[belt_n].first = id;
-			belt[belt_n].size++;
-			box[id] = { 0,belt_n,-1,0 };
+				box[id].belt_id = belt_id;
+				box[id].prev = -1;
+				box[id].next = -1;
+			}
+			else if (cnt == pivot - 1)
+			{
+				belt[belt_id].back = id;
+				
+				box[id].belt_id = belt_id;
+				box[id].prev = input[i - 1];
+				box[id].next = -1;
+				box[input[i - 1]].next = id;
+			}
+			else {
+				box[id].belt_id = belt_id;
+				box[id].prev = input[i - 1];
+				box[input[i - 1]].next = id;
+			}
+			cnt++;
+			if (cnt == pivot)
+			{
+				cnt = 0;
+				belt_id += 1;
+			}
 		}
-		else if (cnt == n / m) {
-			belt[belt_n].end = id;
-			belt[belt_n].size++;
-			box[v_box[i - 1]].back = id;
-			box[id] = { 0,belt_n,v_box[i - 1],-1 };
-
-			belt_n++;
-			cnt = 0;
-		}
-		else {
-			box[v_box[i - 1]].back = id;
-			belt[belt_n].size++;
-			box[id] = { 0,belt_n,v_box[i - 1],0 };
+		for (int i = 0; i < n; i++)
+		{
+			int w = 0;
+			cin >> w;
+			box[input[i]].weight = w;
 		}
 	}
+	else if (Q == 200)
+	{
+		int w_max;
+		cin >> w_max;
+		int cnt = 0;
+		// m개 벨트 탐색
+		for (int i = 1; i <= m; i++)
+		{
+			if (belt[i].num == 0)
+				continue;
+			
+			int id = belt[i].front;
+			// 하차
+			if (box[id].weight <= w_max)
+			{
+				cnt += box[id].weight;
+				// box가 1개인 경우
+				if (belt[i].num == 1)
+				{
+					belt[i].front = -1;
+					belt[i].back = -1;
 
-	for (int i = 0; i < n; i++) {
-		int weight;
-		cin >> weight;
+					box[id] = { 0, 0, -1, -1 };
+				}
+				// box가 여러개인 경우
+				else
+				{
+					int next = box[id].next;
+					box[id] = { 0, 0, -1, -1 };
+					box[next].prev = -1;
 
-		box[v_box[i]].weight = weight;
+					belt[i].front = next;
+				}
+				belt[i].num -= 1;
+			}
+			else
+			{
+				// box가 1개인 경우
+				if (belt[i].num == 1) continue;
+				// box가 여러개인 경우
+				int next = box[id].next;
+				int back = belt[i].back;
+
+				box[id].prev = back;
+				box[id].next = -1;
+
+				box[next].prev = -1;
+				box[back].next = id;
+
+				belt[i].front = next;
+				belt[i].back = id;
+			}
+		}
+		cout << cnt << endl;
 	}
+	else if (Q == 300)
+	{
+		int r_id;
+		cin >> r_id;
+		// box가 있으면
+		if (box[r_id].weight != 0)
+		{
+			int belt_id = box[r_id].belt_id;
+			int prev = box[r_id].prev;
+			int next = box[r_id].next;
+			belt[belt_id].num -= 1;
 
-	for (int i = 1; i <= m; i++) {
-		parent[i] = i;
+			// 벨트 위의 유일한 박스이면
+			if (prev == -1 && next == -1)
+			{
+				belt[belt_id].front = -1;
+				belt[belt_id].back = -1;
+			}
+			// 맨 앞이면
+			else if (prev == -1)
+			{
+				belt[belt_id].front = next;
+				box[next].prev = -1;
+			}
+			// 맨 뒤면
+			else if (next == -1)
+			{
+				belt[belt_id].back = prev;
+				box[prev].next = -1;
+			}
+			else
+			{
+				box[prev].next = next;
+				box[next].prev = prev;
+			}
+			box[r_id] = { 0, 0, -1, -1 };
+			cout << r_id << endl;
+		}
+		// box가 없으면
+		else 
+		{
+			box[r_id] = { 0, 0, -1, -1 };
+			cout << -1 << endl;
+		}
 	}
+	else if (Q == 400)
+	{
+		int f_id;
+		cin >> f_id;
+		// box가 없다면
+		if (box[f_id].weight == 0)
+		{
+			cout << -1 << endl;
+		}
+		// box가 있다면
+		else
+		{
+			int prev = box[f_id].prev;
+			int next = box[f_id].next;
+			int belt_id = box[f_id].belt_id;
+			int front = belt[belt_id].front;
+			int back = belt[belt_id].back;
+			
+			cout << belt_id << endl;
+			if (belt[belt_id].num == 1) return;
+			if (prev == -1) return ;
+			else if (next == -1)
+			{
+				belt[belt_id].front = f_id;
+				belt[belt_id].back = prev;
 
-	v_box.clear();
-}
+				box[f_id].prev = -1;
+				box[prev].next = -1;
 
-int unload(int w_max) {
-	int sum = 0;
-	for (int i = 1; i <= M; i++) {
-		if (belt[i].wrong == 0 && belt[i].size != 0) {
-			int now_first = belt[i].first;
-			int now_end = belt[i].end;
-			int now_front = box[now_first].front;
-			int now_back = box[now_first].back;
-			if (box[now_first].weight <= w_max) {
-				if (belt[i].size == 1) {
-					belt[i].first = -1;
-					belt[i].end = -1;
+				box[front].prev = f_id;
+				box[f_id].next = front;
+			}
+			else
+			{
+				belt[belt_id].front = f_id;
+				belt[belt_id].back = prev;
+
+				box[f_id].prev = -1;
+				box[prev].next = -1;
+
+				box[back].next = front;
+				box[front].prev = back;
+			}
+		}
+
+	}
+	else if (Q == 500)
+	{
+		int b_num;
+		cin >> b_num;
+		// 벨트가 이미 고장
+		if (belt[b_num].state == -1)
+		{
+			cout << -1 << endl;
+			return;
+		}
+		else cout << b_num << endl;
+		
+		// 고장 벨트에 박스가 0개
+		if (belt[b_num].num == 0)
+		{
+			// 사용할 수 없게 됨
+			belt[b_num] = { 0, -1, -1, -1 };
+			return;
+		}
+		// 정상 벨트 조회
+		int flag = 0;
+		for (int i = b_num + 1 ; i <= m; i++)
+		{
+			if (belt[i].state == -1) continue;
+			// 정상 벨트 찾음
+			flag = 1;
+			belt[i].num += belt[b_num].num;
+			// 정상 벨트에 박스가 0개
+			if (belt[i].num == 0)
+			{
+				belt[i].front = belt[b_num].front;
+				belt[i].back = belt[b_num].back;
+				// 박스이동
+				int k = belt[b_num].front;
+				while (box[k].next != -1)
+				{
+					box[k].belt_id = i;
+					k = box[k].next;
+				}
+				box[k].belt_id = i;
+			}
+			else {
+				int from_front = belt[b_num].front;
+				int to_back = belt[i].back;
+				
+				box[to_back].next = from_front;
+				box[from_front].prev = to_back;
+				
+				belt[i].back = belt[b_num].back;
+				// 박스이동
+				while (box[from_front].next != -1)
+				{
+					box[from_front].belt_id = i;
+					from_front = box[from_front].next;
+				}
+				box[from_front].belt_id = i;
+				belt[i].back = from_front;
+			}
+			// belt[i].num += belt[b_num].num;
+			// 사용할 수 없게 됨
+			belt[b_num] = { 0, -1, -1, -1 };
+			if (flag != 0) break;
+		}
+		// 못찾은 경우 1번부터 다시 조회
+		if (flag == 0)
+		{
+			for (int i = 1; i < b_num; i++)
+			{
+				if (belt[i].state == -1) continue;
+				flag = 1;
+				// 정상 벨트에 박스가 0개
+				if (belt[i].num == 0)
+				{
+					belt[i].front = belt[b_num].front;
+					belt[i].back = belt[b_num].back;
+					// 박스이동
+					int k = belt[b_num].front;
+					while (box[k].next != -1)
+					{
+						box[k].belt_id = i;
+						k = box[k].next;
+					}
+					box[k].belt_id = i;
 				}
 				else {
-					belt[i].first = now_back;
-					box[now_back].front = -1;
-				}
-				box[now_first].belt_num = -1;
-				sum += box[now_first].weight;
-				belt[i].size--;
-			}
-			else {
-				if (belt[i].size == 1) {
-					continue;
-				}
-				else {
-					belt[i].end = now_first;
-					belt[i].first = now_back;
+					int from_front = belt[b_num].front;
+					int to_back = belt[i].back;
 
-					box[now_end].back = now_first;
-					box[now_back].front = -1;
-					box[now_first].front = now_end;
-					box[now_first].back = -1;
+					box[to_back].next = from_front;
+					box[from_front].prev = to_back;
+
+					belt[i].back = belt[b_num].back;
+					// 박스이동
+					while (box[from_front].next != -1)
+					{
+						box[from_front].belt_id = i;
+						from_front = box[from_front].next;
+					}
+					box[from_front].belt_id = i;
+					belt[i].back = from_front;
 				}
+				belt[i].num += belt[b_num].num;
+				// 사용할 수 없게 됨
+				belt[b_num] = { 0, -1, -1, -1 };
+				if (flag != 0) break;
 			}
 		}
-	}
-
-	return sum;
-}
-
-int remove(int r_id) {
-	if (box.find(r_id) == box.end()) {
-		return -1;
-	}
-	else {
-		if (box[r_id].belt_num == -1) {
-			return -1;
-		}
-		else {
-			int belt_n = box[r_id].belt_num;
-			belt_n = find_parent(belt_n);
-			int now_front = box[r_id].front;
-			int now_back = box[r_id].back;
-			if (now_front == -1 && now_back == -1) {
-				belt[belt_n].first = -1;
-				belt[belt_n].end = -1;
-			}
-			else if (now_front == -1) {
-				belt[belt_n].first = now_back;
-				box[now_back].front = -1;
-			}
-			else if (now_back == -1) {
-				belt[belt_n].end = now_back;
-				box[now_front].back = -1;
-			}
-			else {
-				box[now_front].back = now_back;
-				box[now_back].front = now_front;
-			}
-			box[r_id].belt_num = -1;
-			belt[belt_n].size--;
-
-			return 1;
-		}
+		
 	}
 }
 
-int check(int f_id) {
-	if (box.find(f_id) == box.end()) {
-		return -1;
-	}
-	else {
-		if (box[f_id].belt_num == -1) {
-			return -1;
-		}
-		else {
-			int belt_n = box[f_id].belt_num;
-			belt_n = find_parent(belt_n);
-			int now_front = box[f_id].front;
-			int now_back = box[f_id].back;
-			int now_first = belt[belt_n].first;
-			int now_end = belt[belt_n].end;
-
-			if (belt[belt_n].size == 1) {
-				// nothing
-			}
-			if (now_front == -1) {
-				// nothing
-			}
-			else if (now_back == -1) {
-				belt[belt_n].first = f_id;
-				belt[belt_n].end = now_front;
-
-				box[f_id].front = -1;
-				box[now_front].back = -1;
-
-				box[now_first].front = f_id;
-				box[f_id].back = now_first;
-			}
-			else {
-				belt[belt_n].first = f_id;
-				belt[belt_n].end = now_front;
-
-				box[f_id].front = -1;
-				box[now_front].back = -1;
-
-				box[now_end].back = now_first;
-				box[now_first].front = now_end;
-			}
-
-			return belt_n;
-		}
-	}
-}
-
-int brocken(int n) {
-	if (belt[n].wrong == 1) {
-		return -1;
-	}
-	else {
-		if (belt[n].size == 0) {
-			belt[n].size = -1;
-			belt[n].first = -1;
-			belt[n].end = -1;
-			belt[n].wrong = 1;
-		}
-		else {
-			int tmp = n;
-			while (true) {
-				tmp++;
-				if (tmp == M + 1) {
-					tmp = 1;
-				}
-				if (belt[tmp].wrong == 0) {
-					break;
-				}
-			}
-
-			if (belt[tmp].size == 0) {
-				belt[tmp].first = belt[n].first;
-				belt[tmp].end = belt[n].end;
-			}
-			else {
-				int now_end = belt[tmp].end;
-				int prev_first = belt[n].first;
-				box[now_end].back = prev_first;
-				box[prev_first].front = now_end;
-				belt[tmp].end = belt[n].end;
-			}
-			belt[tmp].size += belt[n].size;
-
-			belt[n].size = -1;
-			belt[n].first = -1;
-			belt[n].end = -1;
-			belt[n].wrong = 1;
-
-			parent[n] = tmp;
-		}
-		return 1;
-	}
-}
-
-int main() {
-	ios_base::sync_with_stdio(false);
-	cin.tie(0);
-
+int main()
+{
 	int Q;
 	cin >> Q;
-	for (int t = 1; t <= Q; t++) {
-		int cmd;
-		cin >> cmd;
-		if (cmd == 100) {
-			int n, m;
-			cin >> n >> m;
-			init(n, m);
-		}
-		else if (cmd == 200) {
-			int w_max;
-			cin >> w_max;
-			int result = unload(w_max);
-			cout << result << "\n";
-		}
-		else if (cmd == 300) {
-			int r_id;
-			cin >> r_id;
-			int flag = remove(r_id);
-			if (flag == -1) {
-				cout << -1 << "\n";
-			}
-			else {
-				cout << r_id << "\n";
-			}
-		}
-		else if (cmd == 400) {
-			int f_id;
-			cin >> f_id;
-			int result = check(f_id);
-			if (result == -1) {
-				cout << -1 << "\n";
-			}
-			else {
-				cout << result << "\n";
-			}
-		}
-		else {
-			int b_num;
-			cin >> b_num;
-			int flag = brocken(b_num);
-			if (flag == -1) {
-				cout << -1 << "\n";
-			}
-			else {
-				cout << b_num << "\n";
-			}
-		}
+	for (int i = 0; i < Q; i++)
+	{
+		int order;
+		cin >> order;
+		FUNC(order);
 	}
 
 	return 0;
