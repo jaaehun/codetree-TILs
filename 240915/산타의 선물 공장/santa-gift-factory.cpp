@@ -137,18 +137,15 @@ int remove(int r_id) {
 				belt[belt_n].first = -1;
 				belt[belt_n].end = -1;
 			}
-			else if (now_front == -1)
-			{
+			else if (now_front == -1) {
 				belt[belt_n].first = now_back;
 				box[now_back].front = -1;
 			}
-			else if (now_back == -1)
-			{
+			else if (now_back == -1) {
 				belt[belt_n].end = now_back;
 				box[now_front].back = -1;
 			}
-			else
-			{
+			else {
 				box[now_front].back = now_back;
 				box[now_back].front = now_front;
 			}
@@ -176,24 +173,31 @@ int check(int f_id) {
 			int now_first = belt[belt_n].first;
 			int now_end = belt[belt_n].end;
 
-			if (belt[belt_n].first == f_id) {
+			if (belt[belt_n].size == 1) {
 				// nothing
 			}
-			else if (belt[belt_n].end == f_id) {
-				belt[belt_n].end = now_front;
-				box[now_front].back = -1;
+			if (now_front == -1) {
+				// nothing
+			}
+			else if (now_back == -1) {
 				belt[belt_n].first = f_id;
-				box[now_first].front = f_id;
+				belt[belt_n].end = now_front;
+
 				box[f_id].front = -1;
+				box[now_front].back = -1;
+
+				box[now_first].front = f_id;
 				box[f_id].back = now_first;
 			}
 			else {
-				belt[belt_n].end = now_front;
-				box[now_front].back = -1;
 				belt[belt_n].first = f_id;
-				box[now_first].front = now_end;
-				box[now_end].back = now_first;
+				belt[belt_n].end = now_front;
+
 				box[f_id].front = -1;
+				box[now_front].back = -1;
+
+				box[now_end].back = now_first;
+				box[now_first].front = now_end;
 			}
 
 			return belt_n;
@@ -206,31 +210,44 @@ int brocken(int n) {
 		return -1;
 	}
 	else {
-		int tmp = n;
-		while (true) {
-			tmp++;
-			if (tmp == M + 1) {
-				tmp = 1;
-			}
-			if (belt[tmp].wrong == 0) {
-				break;
-			}
+		if (belt[n].size == 0) {
+			belt[n].size = -1;
+			belt[n].first = -1;
+			belt[n].end = -1;
+			belt[n].wrong = 1;
 		}
-		int now_end = belt[tmp].end;
-		int prev_first = belt[n].first;
-		box[now_end].back = prev_first;
-		box[prev_first].front = now_end;
-		belt[tmp].end = belt[n].end;
-		
-		belt[tmp].size += belt[n].size;
+		else {
+			int tmp = n;
+			while (true) {
+				tmp++;
+				if (tmp == M + 1) {
+					tmp = 1;
+				}
+				if (belt[tmp].wrong == 0) {
+					break;
+				}
+			}
 
-		belt[n].size = -1;
-		belt[n].first = -1;
-		belt[n].end = -1;
-		belt[n].wrong = 1;
+			if (belt[tmp].size == 0) {
+				belt[tmp].first = belt[n].first;
+				belt[tmp].end = belt[n].end;
+			}
+			else {
+				int now_end = belt[tmp].end;
+				int prev_first = belt[n].first;
+				box[now_end].back = prev_first;
+				box[prev_first].front = now_end;
+				belt[tmp].end = belt[n].end;
+			}
+			belt[tmp].size += belt[n].size;
 
-		parent[n] = tmp;
+			belt[n].size = -1;
+			belt[n].first = -1;
+			belt[n].end = -1;
+			belt[n].wrong = 1;
 
+			parent[n] = tmp;
+		}
 		return 1;
 	}
 }
