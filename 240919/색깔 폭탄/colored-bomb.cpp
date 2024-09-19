@@ -14,10 +14,9 @@ struct INFO {
 bool operator< (const INFO& A, const INFO& B) {
 	if (A.total != B.total) {
 		return A.total < B.total;
-	}
-	else if (A.red != B.red) {
+	}else if (A.red != B.red) {
 		return A.red > B.red;
-	}else if (A.y != B.x) {
+	}else if (A.y != B.y) {
 		return A.y < B.y;
 	}
 	else {
