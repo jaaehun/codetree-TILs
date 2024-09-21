@@ -99,7 +99,7 @@ void down() {
 	int d0 = dice[0];
 	int d1 = dice[1];
 	int d2 = dice[2];
-	int d3 = dice[3];
+	int d3 = dice[3];	
 	int d4 = dice[4];
 	int d5 = dice[5];
 
@@ -111,7 +111,7 @@ void down() {
 	dice[5] = d1;
 }
 
-int bfs(int start_y, int start_x) {
+void score(int start_y, int start_x) {
 	q.push({ start_y,start_x });
 	visit[start_y][start_x] = 1;
 	int cnt = 1;
@@ -139,7 +139,7 @@ int bfs(int start_y, int start_x) {
 
 	memset(visit, 0, sizeof(visit));
 
-	return cnt;
+	result += cnt * target;
 }
 
 int main() {
@@ -155,9 +155,12 @@ int main() {
 		}
 	}
 
-	for (int i = 1; i <= 6; i++) {
-		dice[i - 1] = i;
-	}
+	dice[0] = 1;
+	dice[1] = 2;
+	dice[2] = 3;
+	dice[3] = 5;
+	dice[4] = 4;
+	dice[5] = 6;
 
 	int now_y = 0;
 	int now_x = 0;
@@ -190,8 +193,7 @@ int main() {
 			up();
 		}
 
-		int score = bfs(now_y, now_x);
-		result += map[now_y][now_x] * score;
+		score(now_y, now_x);
 
 		if (dice[5] > map[now_y][now_x]) {
 			now_d = turn_90(now_d);
