@@ -140,8 +140,10 @@ void pakman_move() {
 		pak_y += dy[v_dir[i]];
 		pak_x += dx[v_dir[i]];
 
-		map[pak_y][pak_x].clear();
-		death_map[pak_y][pak_x] = -3;
+		if (map[pak_y][pak_x].size() != 0) {
+			map[pak_y][pak_x].clear();
+			death_map[pak_y][pak_x] = -3;
+		}
 	}
 	v_dir.clear();
 }
