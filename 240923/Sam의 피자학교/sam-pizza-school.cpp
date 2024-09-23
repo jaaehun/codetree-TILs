@@ -149,17 +149,17 @@ void fold() {
 	int end_y = N - 1;
 	int begin_x = mid;
 	int end_x = mid + half - 1;
-	int now_c = end_y - begin_y + 1;
-	int now_r = end_x - begin_x + 1;
+	int now_r = end_y - begin_y + 1;
+	int now_c = end_x - begin_x + 1;
 
-	for (int i = 0; i < now_c; i++) {
-		for (int j = 0; j < now_r; j++) {
+	for (int i = 0; i < now_r; i++) {
+		for (int j = 0; j < now_c; j++) {
 			tmp_map[i][j] = map[begin_y + i][begin_x + j];
 		}
 	}
 
-	for (int i = 0; i < now_c; i++) {
-		for (int j = 0; j < now_r; j++) {
+	for (int i = 0; i < now_r; i++) {
+		for (int j = 0; j < now_c; j++) {
 			tmp2_map[i][j] = tmp_map[now_r - i - 1][now_c - j - 1];
 		}
 	}
@@ -170,9 +170,9 @@ void fold() {
 		}
 	}
 
-	for (int i = 0; i < now_c; i++) {
-		for (int j = 0; j < now_r; j++) {
-			map[begin_y - (now_c - i)][end_x + 1 + j] = tmp2_map[i][j];
+	for (int i = 0; i < now_r; i++) {
+		for (int j = 0; j < now_c; j++) {
+			map[begin_y - (now_r - i)][end_x + 1 + j] = tmp2_map[i][j];
 		}
 	}
 
