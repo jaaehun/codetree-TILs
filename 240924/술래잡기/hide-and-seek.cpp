@@ -92,6 +92,11 @@ void move_defenser() {
 						}
 					}
 				}
+				else {
+					for (int v = 0; v < map[i][j].size(); v++) {
+						tmp_map[i][j].push_back(map[i][j][v]);
+					}
+				}
 			}
 		}
 	}
