@@ -188,7 +188,7 @@ int bfs(int start_y, int start_x) {
 
 			if (y > 0 && y <= N && x > 0 && x <= N) {
 				if (visit[y][x] == 0) {
-					if (map[y][x] == 1) {
+					if (map[now_y][now_x] != 3 && map[y][x] == 1) {
 						num = cnt + 1;
 						visit[y][x] = 1;
 						tmp_map[y][x] = 3;
