@@ -58,7 +58,7 @@ void move_player() {
 						int now_x = j + dx[d];
 
 						if (now_y > 0 && now_y <= N && now_x > 0 && now_x <= N) {
-							if (map[now_y][now_x] == 2) {
+							if (map[now_y][now_x] == 3) {
 								tmp_map[now_y][now_x] = 1;
 							}
 						}
