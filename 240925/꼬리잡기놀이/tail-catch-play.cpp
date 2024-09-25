@@ -141,9 +141,11 @@ void select_ball(int round) {
 			ball_y = 1;
 			ball_x = 1;
 		}
-		ball_d = turn_left(ball_d);
 	}
 	else {
+		if (n == 1) {
+			ball_d = turn_left(ball_d);
+		}
 		if (ball_d == 0) {
 			ball_y = n;
 			ball_x = 1;
@@ -247,6 +249,7 @@ int main() {
 	}
 
 	result = 0;
+	ball_d = 3;
 	for (int t = 1; t <= K; t++) {
 		move_player();
 		select_ball(t);
