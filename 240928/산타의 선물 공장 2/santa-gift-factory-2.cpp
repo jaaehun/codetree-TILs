@@ -127,6 +127,7 @@ void change_nonzero(int a, int b) {
 
 	box[a_now].next = b_next;
 	box[a_now].belt_n = b;
+	box[b_next].prev = a_now;
 	belt[b].front = a_now;
 }
 
@@ -267,6 +268,5 @@ int main() {
 			cout << a + 2 * b + 3 * c << "\n";
 		}
 	}
-
 	return 0;
 }
