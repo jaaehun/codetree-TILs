@@ -197,9 +197,11 @@ int divide(int src, int dst) {
 			box[now_n].belt_n = dst;
 			now_n = box[now_n].next;
 		}
-		belt[src].front = now_n;
-		box[now_n].prev = -1;
+		int new_n = now_n;
 		now_n = box[now_n].prev;
+
+		belt[src].front = new_n;
+		box[new_n].prev = -1;
 		if (dst_front == -1) {
 			box[now_n].next = -1;
 			belt[dst].end = now_n;
@@ -265,5 +267,6 @@ int main() {
 			cout << a + 2 * b + 3 * c << "\n";
 		}
 	}
+
 	return 0;
 }
