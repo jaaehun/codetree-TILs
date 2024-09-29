@@ -72,17 +72,21 @@ void move(int id, int d, int first_id) {
 	}
 }
 
+void removal(int id) {
+	for (int i = 1; i <= L; i++) {
+		for (int j = 1; j <= L; j++) {
+			if (knight_map[i][j] == id) {
+				knight_map[i][j] = 0;
+			}
+		}
+	}
+}
+
 void command(int id, int d) {
 	if (knight[id].live == 1) {
 		int flag = possible(id, d);
 		if (flag == 1) {
 			move(id, d, id);
-		}
-
-		for (int i = 1; i <= N; i++) {
-			if (knight[i].hp <= 0) {
-				knight[i].live = -1;
-			}
 		}
 
 		for (int i = 1; i <= L; i++) {
@@ -92,6 +96,14 @@ void command(int id, int d) {
 				}
 			}
 		}
+
+		for (int i = 1; i <= N; i++) {
+			if (knight[i].hp <= 0) {
+				knight[i].live = -1;
+				removal(i);
+			}
+		}
+
 		memset(tmp_map, 0, sizeof(tmp_map));
 	}
 }
@@ -122,7 +134,7 @@ int main() {
 			}
 		}
 	}
-
+	
 	for (int t = 1; t <= Q; t++) {
 		int i, d;
 		cin >> i >> d;
