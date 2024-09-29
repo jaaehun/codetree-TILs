@@ -60,15 +60,17 @@ void change_parent(int c1, int c2) {
 	int parent1 = chat[c1].parent;
 	int parent2 = chat[c2].parent;
 
-	chat[c1].parent = parent2;
-	chat[c2].parent = parent1;
+	if (parent1 != parent2) {
+		chat[c1].parent = parent2;
+		chat[c2].parent = parent1;
 
-	for (int i = 0; i < 2; i++) {
-		if (chat[parent1].children[i] == c1) {
-			chat[parent1].children[i] = c2;
-		}
-		if (chat[parent2].children[i] == c2) {
-			chat[parent2].children[i] = c1;
+		for (int i = 0; i < 2; i++) {
+			if (chat[parent1].children[i] == c1) {
+				chat[parent1].children[i] = c2;
+			}
+			if (chat[parent2].children[i] == c2) {
+				chat[parent2].children[i] = c1;
+			}
 		}
 	}
 }
