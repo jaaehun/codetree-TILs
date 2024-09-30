@@ -136,14 +136,14 @@ void set_authority(int n, int p) {
 	int now = n;
 	int power = chat[n].authority;
 	for (int i = 0; i < power; i++) {
+		if (chat[now].alert == -1) {
+			break;
+		}
 		now = chat[now].parent;
 		if (now == 0) {
 			break;
 		}
 		chat[now].cnt[n] = -1;
-		if (chat[now].alert == -1) {
-			break;
-		}
 	}
 
 	power = min(20, p);
@@ -151,14 +151,14 @@ void set_authority(int n, int p) {
 
 	now = n;
 	for (int i = 0; i < power; i++) {
+		if (chat[now].alert == -1) {
+			break;
+		}
 		now = chat[now].parent;
 		if (now == 0) {
 			break;
 		}
 		chat[now].cnt[n] = 1;
-		if (chat[now].alert == -1) {
-			break;
-		}
 	}
 }
 
@@ -185,7 +185,6 @@ int calculate(int n) {
 			cnt++;
 		}
 	}
-
 	return cnt;
 }
 
