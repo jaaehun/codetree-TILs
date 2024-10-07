@@ -89,15 +89,13 @@ void calculate(int A[5][5], INFO B[17], int score, int y, int x, int dir) {
 			}
 		}
 	}
+
 	int flag = 0;
 	for (int i = 1; i < 4; i++) {
 		int now_y = y + i * dy[dir];
 		int now_x = x + i * dx[dir];
 
 		if (now_y >= 0 && now_y < 4 && now_x >= 0 && now_x < 4) {
-			if (map[now_y][now_x] == 0) {
-				break;
-			}
 			if (map[now_y][now_x] > 0) {
 				flag = 1;
 				int num = map[now_y][now_x];
