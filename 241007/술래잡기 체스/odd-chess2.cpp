@@ -28,20 +28,6 @@ int turn_dir(int d) {
 	}
 }
 
-void copy_map(int A[5][5], int B[5][5]) {
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			A[i][j] = B[i][j];
-		}
-	}
-}
-
-void copy_arr(INFO A[17], INFO B[17]) {
-	for (int i = 1; i <= 16; i++) {
-		A[i] = B[i];
-	}
-}
-
 void calculate(int A[5][5], INFO B[17], int score, int y, int x, int dir) {
 	int map[5][5];
 	INFO defenser[17];
