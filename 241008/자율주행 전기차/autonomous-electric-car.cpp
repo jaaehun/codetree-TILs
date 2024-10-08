@@ -91,7 +91,7 @@ int move_goal(int start_y, int start_x) {
 	q.push({ {start_y,start_x},0 });
 	visit[start_y][start_x] = 1;
 
-	int max_cnt = 0;
+	int max_cnt = -1;
 	while (!q.empty()) {
 		int now_y = q.front().first.first;
 		int now_x = q.front().first.second;
@@ -157,7 +157,7 @@ int main() {
 	while (true) {
 		int dis = pick_player(taxi_y, taxi_x);
 		battery -= dis;
-		if (battery < 0) {
+		if (battery < 0 || dis == -1) {
 			battery = -1;
 			break;
 		}
@@ -166,7 +166,7 @@ int main() {
 		map[target_y][target_x] = 0;
 		dis = move_goal(taxi_y, taxi_x);
 		battery -= dis;
-		if (battery < 0) {
+		if (battery < 0 || dis == -1) {
 			battery = -1;
 			break;
 		}
