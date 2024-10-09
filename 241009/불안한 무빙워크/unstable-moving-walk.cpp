@@ -42,7 +42,7 @@ void move_people() {
 	while (true) {
 		int prev = now - 1;
 		if (prev == 0) {
-			prev = 6;
+			prev = 2 * N;
 		}
 
 		if (map[prev] == 1) {
@@ -58,7 +58,6 @@ void move_people() {
 				}
 			}
 		}
-
 		now = prev;
 		if (now == now_start) {
 			break;
