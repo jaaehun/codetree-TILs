@@ -9,8 +9,8 @@ struct INFO {
 };
 
 int N, K;
-int arr[101];
-int map[101];
+int arr[201];
+int map[201];
 int broke_cnt;
 INFO movingwalk;
 
