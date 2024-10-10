@@ -1,11 +1,9 @@
 #include<iostream>
-#include<string.h>
 
 using namespace std;
 
 int N;
 int map[500][500];
-int tmp_map[500][500];
 int cur_y, cur_x;
 int prev_d;
 int cur_d, cur_cnt, small_cnt, big_cnt;
@@ -52,7 +50,7 @@ void put_dust(int yy, int xx, int d, int s, int n) {
 	int y = yy + s * dy[d];
 	int x = xx + s * dx[d];
 	if (y >= 0 && y < N && x >= 0 && x < N) {
-		tmp_map[y][x] = n;
+		map[y][x] += n;
 	}
 	else {
 		result += n;
@@ -112,15 +110,6 @@ void move_dust() {
 	put_dust(now_y, now_x, now_d, 1, per10);
 	now_d = turn_left(tmp_d);
 	put_dust(now_y, now_x, now_d, 1, per1);
-
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			if (tmp_map[i][j] != 0) {
-				map[i][j] += tmp_map[i][j];
-			}
-		}
-	}
-	memset(tmp_map, 0, sizeof(tmp_map));
 }
 
 int main() {
